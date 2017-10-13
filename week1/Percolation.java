@@ -1,22 +1,16 @@
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import java.util.Scanner;
 
 public class Percolation {
-    WeightedQuickUnionUF uf;
-    boolean[] opens;
-    int start;
-    int end;
-    int n;
-
-    private int xyTo1D(int i, int j) {
-        i -= 1;
-        j -= 1;
-        return n * i + j;
-    }
+    private final WeightedQuickUnionUF uf;
+    private final boolean[] opens;
+    private final int start;
+    private final int end;
+    private final int n;
+    private int openSites;
 
     public Percolation(int m) {
+        if (m <= 0)
+            throw new IndexOutOfBoundsException("m out of bounds");
         n = m;
         int size = n * n + 2;
         uf = new WeightedQuickUnionUF(size);
@@ -34,18 +28,38 @@ public class Percolation {
         for (int i = size - 3; i > size - 3 - n; i -= 1) {
             uf.union(i, end);
         }
+        openSites = 0;
+    }
+
+    private int xyTo1D(int i, int j) {
+        i -= 1;
+        j -= 1;
+        return n * i + j;
     }
 
     public boolean isOpen(int row, int col) {
+        if (row <= 0 || row > n)
+            throw new IndexOutOfBoundsException("row out of bounds");
+        if (col <= 0 || col > n)
+            throw new IndexOutOfBoundsException("col out of bounds");
         return opens[xyTo1D(row, col)];
     }
 
     public boolean isFull(int row, int col) {
-        return !isOpen(row, col);
+        if (row <= 0 || row > n)
+            throw new IndexOutOfBoundsException("row out of bounds");
+        if (col <= 0 || col > n)
+            throw new IndexOutOfBoundsException("col out of bounds");
+        return isOpen(row, col) && uf.connected(start, xyTo1D(row, col));
     }
 
     public void open(int row, int col) {
-        if (isFull(row, col)) {
+        if (row <= 0 || row > n)
+            throw new IndexOutOfBoundsException("row out of bounds");
+        if (col <= 0 || col > n)
+            throw new IndexOutOfBoundsException("col out of bounds");
+        if (!isOpen(row, col)) {
+            openSites += 1;
             int index = xyTo1D(row, col);
             opens[index] = true;
 
@@ -72,16 +86,10 @@ public class Percolation {
     }
 
     public int numberOfOpenSites() {
-        int count = 0;
-        for (int i = 0; i < n * n; i += 1) {
-            if (opens[i]) {
-                count += 1;
-            }
-        }
-        return count;
+        return openSites;
     }
 
     public boolean percolates() {
-        return uf.connected(start, end);
+        return uf.connected(start, end) && numberOfOpenSites() > 0;
     }
 }
