@@ -9,7 +9,13 @@ public class BruteCollinearPoints {
                         Point r = points[k];
                         Point s = points[l];
 
+                        Double pSlopeToq = p.slopeTo(q);
+                        Double pSlopeTor = p.slopeTo(r);
+                        Double pSlopeTos = p.slopeTo(s);
 
+                        if (pSlopeToq == pSlopeTor && pSlopeTor == pSlopeTos) {
+
+                        }
                     }
                 }
             }
